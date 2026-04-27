@@ -1,0 +1,14 @@
+[
+  {
+    "id": "clock_puzzle",
+    "title": "Clock Puzzle",
+    "description": "What time is shown on the clock?",
+    "answer": "3"
+  },
+  {
+    "id": "door_puzzle",
+    "title": "Door Puzzle",
+    "description": "Enter the code to unlock the door",
+    "answer": "1234"
+  }
+]
