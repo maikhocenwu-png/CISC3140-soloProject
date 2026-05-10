@@ -1,14 +1,47 @@
 [
   {
-    "id": "clock_puzzle",
-    "title": "Clock Puzzle",
-    "description": "What time is shown on the clock?",
-    "answer": "3"
+    "id": "bookshelf_puzzle",
+    "type": "observation",
+    "hint": "Count only the red books on the shelf",
+    "answer": "3",
+    "reward": "torn_paper"
   },
   {
-    "id": "door_puzzle",
-    "title": "Door Puzzle",
-    "description": "Enter the code to unlock the door",
-    "answer": "1234"
+    "id": "drawer_code",
+    "type": "item_required",
+    "requiredItem": "torn_paper",
+    "hint": "Rearrange the four digits on the torn paper",
+    "answer": "4729",
+    "reward": "brass_key"
+  },
+  {
+    "id": "clock_puzzle",
+    "type": "observation",
+    "hint": "The hour hand points to the hour of the shadow",
+    "answer": "3",
+    "reward": null
+  },
+  {
+    "id": "door_lock",
+    "type": "item_required",
+    "requiredItem": "brass_key",
+    "hint": "You already have what you need",
+    "answer": "open",
+    "reward": null
+  },
+  {
+    "id": "mirror_puzzle",
+    "type": "observation",
+    "hint": "Read the word in the mirror — it reverses letters",
+    "answer": "life",
+    "reward": "silver_coin"
+  },
+  {
+    "id": "final_lock",
+    "type": "item_required",
+    "requiredItem": "silver_coin",
+    "hint": "The coin fits the slot in the final door",
+    "answer": "coin",
+    "reward": null
   }
 ]
