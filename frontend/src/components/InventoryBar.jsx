@@ -1,14 +1,15 @@
 import useGameStore from '../store/gameStore'
 
 const ITEMS = {
-  torn_paper: { emoji: '📄', label: 'Torn Paper' },
-  brass_key:  { emoji: '🗝️', label: 'Brass Key' },
-  candle:     { emoji: '🕯️', label: 'Candle' },
-  silver_coin:{ emoji: '🪙', label: 'Silver Coin' },
+  torn_paper:  { emoji: '📄', label: 'Torn Paper' },
+  brass_key:   { emoji: '🗝️', label: 'Brass Key' },
+  candle:      { emoji: '🕯️', label: 'Candle' },
+  silver_coin: { emoji: '🪙', label: 'Silver Coin' },
+  raven_key:   { emoji: '🪶', label: 'Raven Key' },
 }
 
 export default function InventoryBar() {
-  const inventory = useGameStore((s) => s.inventory)
+  const inventory = useGameStore((state) => state.inventory)
 
   return (
     <div className="flex items-center gap-3 w-full px-4 py-3"
@@ -18,15 +19,16 @@ export default function InventoryBar() {
       {inventory.length === 0
         ? <span className="text-xs" style={{ color: '#2a2010' }}>No items yet — explore the room</span>
         : inventory.map((item) => {
-          const def = ITEMS[item] || { emoji: '?', label: item }
-          return (
-            <div key={item} className="flex items-center gap-1 px-3 py-1 rounded text-xs border"
-              style={{ background: '#1e1810', borderColor: '#c9a84c', color: '#c9a84c' }}>
-              <span>{def.emoji}</span>
-              <span>{def.label}</span>
-            </div>
-          )
-        })
+            const def = ITEMS[item] || { emoji: '?', label: item }
+            return (
+              <div key={item}
+                className="flex items-center gap-1 px-3 py-1 rounded text-xs border"
+                style={{ background: '#1e1810', borderColor: '#c9a84c', color: '#c9a84c' }}>
+                <span>{def.emoji}</span>
+                <span>{def.label}</span>
+              </div>
+            )
+          })
       }
     </div>
   )

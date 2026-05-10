@@ -3,12 +3,18 @@ import useGameStore from '../store/gameStore'
 import client from '../api/client'
 
 export default function PuzzleModal() {
-  const { activePuzzle, closePuzzle, inventory, addItem, solvePuzzle, useHint } = useGameStore()
-  const [answer, setAnswer] = useState('')
-  const [feedback, setFeedback] = useState('')
-  const [feedbackType, setFeedbackType] = useState('') // 'success' | 'error'
-  const [loading, setLoading] = useState(false)
-  const [showHint, setShowHint] = useState(false)
+  const activePuzzle = useGameStore((state) => state.activePuzzle)
+  const closePuzzle  = useGameStore((state) => state.closePuzzle)
+  const inventory    = useGameStore((state) => state.inventory)
+  const addItem      = useGameStore((state) => state.addItem)
+  const solvePuzzle  = useGameStore((state) => state.solvePuzzle)
+  const useHint      = useGameStore((state) => state.useHint)
+
+  const [answer, setAnswer]         = useState('')
+  const [feedback, setFeedback]     = useState('')
+  const [feedbackType, setFeedbackType] = useState('')
+  const [loading, setLoading]       = useState(false)
+  const [showHint, setShowHint]     = useState(false)
 
   if (!activePuzzle) return null
 
@@ -27,7 +33,7 @@ export default function PuzzleModal() {
 
       if (res.data.success) {
         setFeedbackType('success')
-        setFeedback(res.data.message || 'Correct!')
+        setFeedback('Correct!')
         solvePuzzle(activePuzzle.id)
         if (res.data.reward) addItem(res.data.reward)
         setTimeout(() => {
@@ -35,7 +41,6 @@ export default function PuzzleModal() {
           setAnswer('')
           setFeedback('')
           setShowHint(false)
-          // Tell Phaser the puzzle was solved
           window.dispatchEvent(new CustomEvent('puzzleSolved', {
             detail: { puzzleId: activePuzzle.id, reward: res.data.reward }
           }))
@@ -70,24 +75,20 @@ export default function PuzzleModal() {
       <div className="w-96 rounded-lg border p-8 relative"
         style={{ background: '#120f0a', borderColor: '#3a2f1e' }}>
 
-        {/* Close button */}
         <button onClick={handleClose}
           className="absolute top-4 right-4 text-xs"
           style={{ color: '#3a2f1e' }}>✕</button>
 
-        {/* Puzzle title */}
         <h2 className="text-lg mb-2 text-center"
           style={{ color: '#c9a84c', fontFamily: 'Georgia, serif' }}>
           {activePuzzle.title}
         </h2>
 
-        {/* Puzzle description */}
         <p className="text-sm text-center mb-6"
           style={{ color: '#8b7a5e', fontFamily: 'Georgia, serif' }}>
           {activePuzzle.description}
         </p>
 
-        {/* Answer form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
             type="text"
@@ -111,26 +112,21 @@ export default function PuzzleModal() {
           )}
 
           <button type="submit" disabled={loading}
-            className="w-full py-2 rounded text-sm transition-opacity"
+            className="w-full py-2 rounded text-sm"
             style={{ background: '#c9a84c', color: '#0a0a0a', opacity: loading ? 0.6 : 1 }}>
             {loading ? 'Checking...' : 'Submit Answer'}
           </button>
         </form>
 
-        {/* Hint */}
         <div className="mt-4 text-center">
-          {!showHint ? (
-            <button onClick={handleHint}
-              className="text-xs underline"
-              style={{ color: '#3a2f1e' }}>
-              Use a hint (costs 1 hint)
-            </button>
-          ) : (
-            <p className="text-xs italic"
-              style={{ color: '#6b5a3e', fontFamily: 'Georgia, serif' }}>
-              💡 {activePuzzle.hint}
-            </p>
-          )}
+          {!showHint
+            ? <button onClick={handleHint} className="text-xs underline" style={{ color: '#3a2f1e' }}>
+                Use a hint (costs 1 hint)
+              </button>
+            : <p className="text-xs italic" style={{ color: '#6b5a3e', fontFamily: 'Georgia, serif' }}>
+                💡 {activePuzzle.hint}
+              </p>
+          }
         </div>
       </div>
     </div>

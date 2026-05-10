@@ -79,17 +79,22 @@ export default function WinScreen() {
       </div>
 
       <div className="flex gap-4">
-        <button onClick={handlePlayAgain}
-          className="px-6 py-2 rounded text-sm"
-          style={{ background: '#6dbf67', color: '#0a0a0a' }}>
-          Play Again
-        </button>
-        <button onClick={() => { logout(); setScreen('title') }}
-          className="px-6 py-2 rounded text-sm border"
-          style={{ borderColor: '#3a6b38', color: '#6b5a3e' }}>
-          Sign Out
-        </button>
-      </div>
+  <button onClick={handlePlayAgain}
+    className="px-6 py-2 rounded text-sm"
+    style={{ background: '#6dbf67', color: '#0a0a0a' }}>
+    Play Again
+  </button>
+  <button onClick={handleReset}
+    className="px-6 py-2 rounded text-sm border"
+    style={{ borderColor: '#5a2020', color: '#e05555' }}>
+    Reset Save
+  </button>
+  <button onClick={() => { logout(); setScreen('title') }}
+    className="px-6 py-2 rounded text-sm border"
+    style={{ borderColor: '#3a6b38', color: '#6b5a3e' }}>
+    Sign Out
+  </button>
+</div>
     </div>
   )
 }

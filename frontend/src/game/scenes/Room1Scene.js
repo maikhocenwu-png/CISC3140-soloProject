@@ -114,6 +114,22 @@ export default class Room1Scene extends Phaser.Scene {
       // Paper appears after bookshelf solved — handled in onPuzzleSolved
     }
 
+    // Sliding puzzle object — old journal on the desk
+    const journal = this.add.rectangle(300, 345, 50, 35, 0x2a1f0a)
+      .setInteractive({ cursor: 'pointer' })
+      .setStrokeStyle(1, 0x8b6914)
+
+      this.add.text(300, 372, 'journal', {
+        fontSize: '9px', color: '#6b5a3e', fontFamily: 'Georgia, serif'
+          }).setOrigin(0.5)
+
+        journal.on('pointerover', () => journal.setFillStyle(0x3a2f10))
+        journal.on('pointerout', () => journal.setFillStyle(0x2a1f0a))
+        journal.on('pointerdown', () => {
+            // Tell React to open the sliding puzzle
+              window.dispatchEvent(new CustomEvent('openSlidingPuzzle'))
+          })
+
     // Drawer puzzle hotspot
     if (!store.solvedPuzzles.includes('drawer_code')) {
       drawer.setInteractive({ cursor: 'pointer' })

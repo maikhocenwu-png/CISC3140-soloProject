@@ -36,11 +36,6 @@ const useGameStore = create((set) => ({
       : [...state.solvedPuzzles, puzzleId]
   })),
 
-  // Puzzle modal
-  activePuzzle: null,
-  openPuzzle: (puzzle) => set({ activePuzzle: puzzle }),
-  closePuzzle: () => set({ activePuzzle: null }),
-
   useHint: () => set((state) => ({ hintsUsed: state.hintsUsed + 1 })),
 
   startGame: () => set({
@@ -56,6 +51,12 @@ const useGameStore = create((set) => ({
     solvedPuzzles: save.solved || [],
     currentRoom: save.currentRoom || 'room1',
   }),
+
+  // Puzzle modal
+  activePuzzle: null,
+  openPuzzle: (puzzle) => set({ activePuzzle: puzzle }),
+  closePuzzle: () => set({ activePuzzle: null }),
+
 }))
 
 export default useGameStore
