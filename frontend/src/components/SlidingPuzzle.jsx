@@ -20,6 +20,10 @@ function Tile({ index, position }) {
   const bgX = -col * TILE_SIZE
   const bgY = -row * TILE_SIZE
 
+  const handleSkip = () => {
+  onSolve?.()
+}
+
   return (
     <div style={{
       width: TILE_SIZE,
@@ -185,6 +189,34 @@ export default function SlidingPuzzle({ onSolve, onClose }) {
             💡 Arrange the pieces so the golden eye is whole and staring back at you.
           </p>
         )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 4px' }}>
+  <span style={{ fontSize: 11, color: '#3a2f1e' }}>Moves: {moves}</span>
+  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+    {!solved && (
+      <button onClick={handleHint} style={{
+        background: 'none', border: 'none',
+        color: '#4a3a2a', fontSize: 11,
+        cursor: 'pointer', textDecoration: 'underline',
+      }}>
+        {showHint ? '💡 ' + 'Arrange the golden eye whole' : 'Hint'}
+      </button>
+    )}
+    {!solved && (
+      <button onClick={handleSkip} style={{
+        background: 'none',
+        border: '1px solid #3a2010',
+        color: '#8b4a1a', fontSize: 11,
+        borderRadius: 4, padding: '2px 8px', cursor: 'pointer',
+      }}>
+        Skip puzzle
+      </button>
+    )}
+    {solved && (
+      <span style={{ fontSize: 11, color: '#6dbf67' }}>✓ The eye opens...</span>
+    )}
+  </div>
+</div>
 
         {solved && (
           <div className="text-center">

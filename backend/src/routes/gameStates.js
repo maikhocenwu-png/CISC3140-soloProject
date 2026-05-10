@@ -48,4 +48,13 @@ router.post('/puzzles/check', auth, (req, res) => {
   res.json({ success: correct, reward: correct ? puzzle.reward : null, message: correct ? 'Correct!' : 'Wrong answer, try again' })
 })
 
+// POST /api/game/puzzles/reveal — give the answer (costs a hint)
+router.post('/puzzles/reveal', auth, (req, res) => {
+  const puzzles = require('../data/puzzles.json')
+  const { puzzleId } = req.body
+  const puzzle = puzzles.find(p => p.id === puzzleId)
+  if (!puzzle) return res.status(404).json({ message: 'Puzzle not found' })
+  res.json({ answer: puzzle.answer })
+})
+
 module.exports = router

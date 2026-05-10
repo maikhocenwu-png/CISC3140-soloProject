@@ -10,11 +10,11 @@ export default function PuzzleModal() {
   const solvePuzzle  = useGameStore((state) => state.solvePuzzle)
   const useHint      = useGameStore((state) => state.useHint)
 
-  const [answer, setAnswer]         = useState('')
-  const [feedback, setFeedback]     = useState('')
+  const [answer, setAnswer]             = useState('')
+  const [feedback, setFeedback]         = useState('')
   const [feedbackType, setFeedbackType] = useState('')
-  const [loading, setLoading]       = useState(false)
-  const [showHint, setShowHint]     = useState(false)
+  const [loading, setLoading]           = useState(false)
+  const [showHint, setShowHint]         = useState(false)
 
   if (!activePuzzle) return null
 
@@ -23,14 +23,12 @@ export default function PuzzleModal() {
     if (!answer.trim()) return
     setLoading(true)
     setFeedback('')
-
     try {
       const res = await client.post('/api/game/puzzles/check', {
         puzzleId: activePuzzle.id,
         answer: answer.trim(),
         inventory,
       })
-
       if (res.data.success) {
         setFeedbackType('success')
         setFeedback('Correct!')
@@ -57,6 +55,18 @@ export default function PuzzleModal() {
     }
   }
 
+  const handleGiveAnswer = async () => {
+  try {
+    const res = await client.post('/api/game/puzzles/reveal', {
+      puzzleId: activePuzzle.id,
+    })
+    setAnswer(String(res.data.answer))
+    useHint() // costs a hint
+  } catch {
+    setFeedback('Could not fetch answer.')
+    setFeedbackType('error')
+  }
+}
   const handleHint = () => {
     setShowHint(true)
     useHint()
@@ -70,63 +80,117 @@ export default function PuzzleModal() {
   }
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-50"
-      style={{ background: 'rgba(0,0,0,0.75)' }}>
-      <div className="w-96 rounded-lg border p-8 relative"
-        style={{ background: '#120f0a', borderColor: '#3a2f1e' }}>
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 9999,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'rgba(0,0,0,0.85)',
+      pointerEvents: 'auto',
+    }}>
+      <div style={{
+        width: 380,
+        background: '#120f0a',
+        border: '1px solid #3a2f1e',
+        borderRadius: 10,
+        padding: 32,
+        position: 'relative',
+        pointerEvents: 'auto',
+      }}>
+        {/* Close */}
+        <button
+          onClick={handleClose}
+          style={{
+            position: 'absolute', top: 12, right: 14,
+            background: 'none', border: 'none',
+            color: '#6b5a3e', fontSize: 18, cursor: 'pointer',
+            lineHeight: 1,
+          }}>
+          ✕
+        </button>
 
-        <button onClick={handleClose}
-          className="absolute top-4 right-4 text-xs"
-          style={{ color: '#3a2f1e' }}>✕</button>
-
-        <h2 className="text-lg mb-2 text-center"
-          style={{ color: '#c9a84c', fontFamily: 'Georgia, serif' }}>
+        {/* Title */}
+        <h2 style={{
+          color: '#c9a84c', fontFamily: 'Georgia, serif',
+          fontSize: 18, textAlign: 'center', marginBottom: 8,
+        }}>
           {activePuzzle.title}
         </h2>
 
-        <p className="text-sm text-center mb-6"
-          style={{ color: '#8b7a5e', fontFamily: 'Georgia, serif' }}>
+        {/* Description */}
+        <p style={{
+          color: '#8b7a5e', fontFamily: 'Georgia, serif',
+          fontSize: 13, textAlign: 'center', marginBottom: 24, lineHeight: 1.6,
+        }}>
           {activePuzzle.description}
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        {/* Answer input */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <input
             type="text"
             placeholder={activePuzzle.placeholder || 'Enter your answer...'}
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
             autoFocus
-            className="w-full px-4 py-2 rounded text-sm text-center outline-none tracking-widest"
-            style={{ background: '#1e1810', border: '1px solid #3a2f1e', color: '#e8e0d0' }}
+            style={{
+              width: '100%', padding: '8px 16px',
+              borderRadius: 6, border: '1px solid #3a2f1e',
+              background: '#1e1810', color: '#e8e0d0',
+              fontSize: 14, textAlign: 'center',
+              letterSpacing: '0.1em', outline: 'none',
+              boxSizing: 'border-box',
+            }}
           />
 
           {feedback && (
-            <p className="text-xs text-center py-2 px-3 rounded"
-              style={{
-                background: feedbackType === 'success' ? '#0d1a0c' : '#2a1010',
-                color: feedbackType === 'success' ? '#6dbf67' : '#e05555',
-                border: `1px solid ${feedbackType === 'success' ? '#2a4a28' : '#5a2020'}`
-              }}>
+            <p style={{
+              fontSize: 12, textAlign: 'center', padding: '6px 12px',
+              borderRadius: 6,
+              background: feedbackType === 'success' ? '#0d1a0c' : '#2a1010',
+              color: feedbackType === 'success' ? '#6dbf67' : '#e05555',
+              border: `1px solid ${feedbackType === 'success' ? '#2a4a28' : '#5a2020'}`,
+            }}>
               {feedback}
             </p>
           )}
 
-          <button type="submit" disabled={loading}
-            className="w-full py-2 rounded text-sm"
-            style={{ background: '#c9a84c', color: '#0a0a0a', opacity: loading ? 0.6 : 1 }}>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%', padding: '8px 0',
+              borderRadius: 6, border: 'none',
+              background: '#c9a84c', color: '#0a0a0a',
+              fontSize: 13, cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.6 : 1,
+            }}>
             {loading ? 'Checking...' : 'Submit Answer'}
           </button>
         </form>
 
-        <div className="mt-4 text-center">
-          {!showHint
-            ? <button onClick={handleHint} className="text-xs underline" style={{ color: '#3a2f1e' }}>
-                Use a hint (costs 1 hint)
-              </button>
-            : <p className="text-xs italic" style={{ color: '#6b5a3e', fontFamily: 'Georgia, serif' }}>
-                💡 {activePuzzle.hint}
-              </p>
-          }
+        {/* Hint + Give Answer row */}
+        <div style={{ marginTop: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <button
+            onClick={handleHint}
+            style={{
+              background: 'none', border: 'none',
+              color: '#4a3a2a', fontSize: 11,
+              cursor: 'pointer', textDecoration: 'underline',
+            }}>
+            {showHint ? '💡 ' + activePuzzle.hint : 'Show hint'}
+          </button>
+          <button
+            onClick={handleGiveAnswer}
+            style={{
+              background: 'none', border: '1px solid #3a2010',
+              color: '#8b4a1a', fontSize: 11, borderRadius: 4,
+              padding: '2px 8px', cursor: 'pointer',
+            }}>
+            Give me the answer
+          </button>
         </div>
       </div>
     </div>

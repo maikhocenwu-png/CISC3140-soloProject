@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-const useGameStore = create((set) => ({
+const useGameStore = create((set, get) => ({
   // Auth
   token: null,
   username: null,
@@ -14,8 +14,13 @@ const useGameStore = create((set) => ({
   },
 
   // Screen navigation
-  screen: 'title',        // 'title' | 'game' | 'win'
-  setScreen: (screen) => set({ screen }),
+  screen: 'title',
+  setScreen: (screen) => {
+    if (screen === 'win') {
+      window.dispatchEvent(new CustomEvent('gameWon'))
+    }
+    set({ screen })
+  },
 
   // Game state
   inventory: [],
@@ -57,6 +62,13 @@ const useGameStore = create((set) => ({
   openPuzzle: (puzzle) => set({ activePuzzle: puzzle }),
   closePuzzle: () => set({ activePuzzle: null }),
 
+  // Music
+  musicOn: true,
+  toggleMusic: () => set((state) => ({ musicOn: !state.musicOn })),
+
+  // Active inventory item (for image popup)
+  activeInventoryItem: null,
+  setActiveInventoryItem: (item) => set({ activeInventoryItem: item }),
 }))
 
 export default useGameStore
