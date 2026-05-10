@@ -1,18 +1,18 @@
 {
-  "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
-    "@prisma/adapter-neon": "^7.7.0",
-    "@prisma/client": "^7.7.0",
-    "axios": "^1.15.2",
-    "dotenv": "^17.4.2",
-    "phaser": "^4.0.0",
-    "react-router-dom": "^7.14.2",
-    "zustand": "^5.0.12"
+  "name": "escape-room-game",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"yellow,cyan\" \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "test": "npm run test --workspace=backend"
   },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "devDependencies": {
-    "autoprefixer": "^10.5.0",
-    "postcss": "^8.5.12",
-    "prisma": "^6.19.3",
-    "tailwindcss": "^4.2.4"
+    "concurrently": "^8.2.2"
   }
 }
