@@ -8,19 +8,32 @@ import SlidingPuzzle from '../components/SlidingPuzzle'
 import client from '../api/client'
 import audioManager from '../game/AudioManager'
 
+const topBtnStyle = (borderColor, color) => ({
+  fontSize: 11, padding: '3px 9px', borderRadius: 4,
+  border: `1px solid ${borderColor}`, color,
+  background: 'transparent', cursor: 'pointer',
+})
+
 export default function GameScreen() {
-  const gameRef    = useRef(null)
-  const phaserGame = useRef(null)
+  const gameRef     = useRef(null)
+  const phaserGame  = useRef(null)
+  const timers      = useRef([])
   const [showSliding, setShowSliding] = useState(false)
-  const [cursorStyle, setCursorStyle] = useState('auto')
   const { inventory, solvedPuzzles, currentRoom, addItem, solvePuzzle } = useGameStore()
-  const musicOn    = useGameStore((s) => s.musicOn)
+  const musicOn     = useGameStore((s) => s.musicOn)
   const toggleMusic = useGameStore((s) => s.toggleMusic)
 
+  // Restore candle cursor if already in inventory
   useEffect(() => {
-    audioManager.setEnabled(musicOn)
-    if (!musicOn) audioManager.stopBg()
-  }, [musicOn])
+    if (inventory.includes('candle')) {
+      document.body.style.cursor = 'url(/assets/ui/candle.gif) 16 32, auto'
+    }
+  }, [inventory])
+
+  function clearTimers() {
+    timers.current.forEach(clearTimeout)
+    timers.current = []
+  }
 
   function mountPhaser() {
     if (!gameRef.current) return
@@ -33,13 +46,14 @@ export default function GameScreen() {
       if (c) {
         c.style.position = 'relative'
         c.style.display  = 'block'
-        c.style.top = 'auto'
-        c.style.left = 'auto'
+        c.style.top      = 'auto'
+        c.style.left     = 'auto'
       }
     }
     fix()
-    setTimeout(fix, 100)
-    setTimeout(fix, 500)
+    const t1 = setTimeout(fix, 100)
+    const t2 = setTimeout(fix, 500)
+    timers.current = [t1, t2]
   }
 
   useEffect(() => {
@@ -54,26 +68,30 @@ export default function GameScreen() {
     }
     window.addEventListener('gameWon', winHandler)
 
-    // Candle cursor
     const cursorHandler = (e) => {
       if (e.detail === 'candle') {
-        // Use animated GIF if available, fallback to emoji CSS trick
-        setCursorStyle('url(/assets/ui/candle.gif) 16 32, auto')
+        document.body.style.cursor = 'url(/assets/ui/candle.gif) 16 32, auto'
       }
     }
     window.addEventListener('setCursor', cursorHandler)
 
     return () => {
+      clearTimers()
       phaserGame.current?.destroy(true)
       window.removeEventListener('openSlidingPuzzle', openHandler)
       window.removeEventListener('gameWon', winHandler)
       window.removeEventListener('setCursor', cursorHandler)
+      document.body.style.cursor = 'auto'
     }
   }, [])
 
   const handleSave = async () => {
     try {
-      await client.post('/api/game/save', { inventory, solved: solvedPuzzles, currentRoom })
+      await client.post('/api/game/save', {
+        inventory,
+        solved: solvedPuzzles,
+        currentRoom,
+      })
       alert('Progress saved!')
     } catch {
       alert('Save failed. Are you logged in?')
@@ -86,9 +104,10 @@ export default function GameScreen() {
       await client.delete('/api/game/save')
       phaserGame.current?.destroy(true)
       phaserGame.current = null
+      clearTimers()
       useGameStore.getState().startGame()
       audioManager.reset()
-      setTimeout(() => mountPhaser(), 100)
+      setTimeout(() => mountPhaser(), 150)
     } catch {
       alert('Reset failed.')
     }
@@ -103,10 +122,14 @@ export default function GameScreen() {
     }))
   }
 
-  const anyModalOpen = showSliding
+  const handleMusicToggle = () => {
+    const next = !musicOn
+    toggleMusic()
+    audioManager.setEnabled(next)
+  }
 
   return (
-    <div style={{ width: 800, display: 'flex', flexDirection: 'column', cursor: cursorStyle }}>
+    <div style={{ width: 800, display: 'flex', flexDirection: 'column' }}>
 
       {/* Top bar */}
       <div style={{
@@ -121,47 +144,51 @@ export default function GameScreen() {
           THE FORGOTTEN ROOM
         </span>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={() => { toggleMusic(); audioManager.setEnabled(!musicOn) }}
+          <button onClick={handleMusicToggle}
             title={musicOn ? 'Mute' : 'Unmute'}
             style={topBtnStyle('#3a2f1e', '#6b5a3e')}>
             {musicOn ? '🔊' : '🔇'}
           </button>
-          <button onClick={handleSave} style={topBtnStyle('#3a2f1e', '#c9a84c')}>
+          <button onClick={handleSave}
+            style={topBtnStyle('#3a2f1e', '#c9a84c')}>
             Save
           </button>
-          <button onClick={handleReset} style={topBtnStyle('#5a2020', '#e05555')}>
+          <button onClick={handleReset}
+            style={topBtnStyle('#5a2020', '#e05555')}>
             Reset
           </button>
         </div>
       </div>
 
-      {/* Phaser canvas */}
+      {/* Phaser canvas — fixed height, no overflow */}
       <div ref={gameRef}
         style={{ width: 800, height: 500, overflow: 'hidden', flexShrink: 0 }} />
 
-      {/* Inventory — always below canvas, never blocked */}
+      {/* Inventory — plain sibling below canvas */}
       <InventoryBar />
 
-      {/* Fixed overlay for modals */}
-      <div style={{
-        position: 'fixed', inset: 0, zIndex: 1000,
-        pointerEvents: anyModalOpen ? 'auto' : 'none',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <PuzzleModal />
-        {showSliding && (
+      {/* Puzzle modal — self-contained fixed overlay */}
+      <PuzzleModal />
+
+      {/* Sliding puzzle — full fixed overlay, dark background blocks canvas */}
+      {showSliding && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1000,
+          background: 'rgba(0,0,0,0.92)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'auto',
+        }}>
           <SlidingPuzzle
             onSolve={handleSlidingSolved}
             onClose={() => setShowSliding(false)}
           />
-        )}
-      </div>
+        </div>
+      )}
+
     </div>
   )
 }
-
-const topBtnStyle = (borderColor, color) => ({
-  fontSize: 11, padding: '3px 9px', borderRadius: 4,
-  border: `1px solid ${borderColor}`, color,
-  background: 'transparent', cursor: 'pointer',
-})

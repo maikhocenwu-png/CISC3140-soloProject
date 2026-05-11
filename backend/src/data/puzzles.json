@@ -34,12 +34,12 @@
     "type": "observation",
     "hint": "Read the word in the mirror — it reverses letters",
     "answer": "life",
-    "reward": "silver_coin"
+    "reward": "golden_coin"
   },
   {
     "id": "final_lock",
     "type": "item_required",
-    "requiredItem": "silver_coin",
+    "requiredItem": "golden_coin",
     "hint": "The coin fits the slot in the final door",
     "answer": "coin",
     "reward": null

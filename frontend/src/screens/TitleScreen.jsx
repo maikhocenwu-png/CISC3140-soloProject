@@ -15,16 +15,10 @@ export default function TitleScreen() {
   const toggleMusic = useGameStore((s) => s.toggleMusic)
 
   useEffect(() => {
-    audioManager.setEnabled(musicOn)
-    audioManager.playBg('title')
-    return () => audioManager.stopBg()
+  audioManager.setEnabled(musicOn)
+  if (musicOn) audioManager.playBg('title')
+  return () => audioManager.stopBg()
   }, [])
-
-  useEffect(() => {
-    audioManager.setEnabled(musicOn)
-    if (musicOn) audioManager.playBg('title')
-    else audioManager.stopBg()
-  }, [musicOn])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -62,16 +56,20 @@ export default function TitleScreen() {
 
       {/* Music toggle */}
       <button
-        onClick={toggleMusic}
-        style={{
-          position: 'fixed', top: 16, right: 16,
-          background: 'none', border: '1px solid #3a2f1e',
-          color: '#6b5a3e', fontSize: 18, cursor: 'pointer',
-          borderRadius: 6, padding: '4px 10px', zIndex: 999,
-        }}
-        title={musicOn ? 'Mute music' : 'Unmute music'}>
-        {musicOn ? '🔊' : '🔇'}
-      </button>
+  onClick={() => {
+    const next = !musicOn
+    toggleMusic()
+    audioManager.setEnabled(next)
+    if (next) audioManager.playBg('title')
+  }}
+  style={{
+    position: 'fixed', top: 16, right: 16,
+    background: 'none', border: '1px solid #3a2f1e',
+    color: '#6b5a3e', fontSize: 18, cursor: 'pointer',
+    borderRadius: 6, padding: '4px 10px', zIndex: 999,
+  }}>
+  {musicOn ? '🔊' : '🔇'}
+</button>
 
       {/* Title */}
       <div style={{ textAlign: 'center', marginBottom: 40 }}>

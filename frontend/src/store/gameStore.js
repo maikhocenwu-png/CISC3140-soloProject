@@ -53,9 +53,19 @@ const useGameStore = create((set, get) => ({
 
   loadSave: (save) => set({
     inventory: save.inventory || [],
-    solvedPuzzles: save.solved || [],
+    solvedPuzzles: save.solved || save.solvedPuzzles || [],
     currentRoom: save.currentRoom || 'room1',
   }),
+
+  solvePuzzle: (puzzleId) => set((state) => {
+        const newSolved = state.solvedPuzzles.includes(puzzleId)
+            ? state.solvedPuzzles
+            : [...state.solvedPuzzles, puzzleId]
+        
+        // Trigger event so Phaser knows immediately
+        window.dispatchEvent(new CustomEvent('puzzleSolved', { detail: { puzzleId } }))
+        return { solvedPuzzles: newSolved }
+    }),
 
   // Puzzle modal
   activePuzzle: null,

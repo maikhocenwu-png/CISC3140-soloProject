@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import useGameStore from '../../store/gameStore'
+import audioManager from '../AudioManager'
 
 export default class Room2Scene extends Phaser.Scene {
   constructor() {
@@ -9,31 +10,38 @@ export default class Room2Scene extends Phaser.Scene {
   }
 
   create() {
-    const store = useGameStore.getState()
-    store.loadSave({ ...store, currentRoom: 'room2' })
+  audioManager.playBg('ambient2')
 
-    const { solvedPuzzles } = useGameStore.getState()
+  const { solvedPuzzles } = useGameStore.getState()
 
-    // Background
-    this.add.rectangle(400, 250, 800, 500, 0x0a0e12)
-    this.add.rectangle(400, 200, 800, 340, 0x0c1016)
-    this.add.rectangle(400, 460, 800, 80, 0x080c10)
+  // Update currentRoom in store cleanly
+  useGameStore.getState().loadSave({
+    inventory:    useGameStore.getState().inventory,
+    solved:       useGameStore.getState().solvedPuzzles,
+    currentRoom:  'room2',
+  })
 
-    this.add.text(400, 18, 'THE CHAMBER', {
-      fontSize: '11px', color: '#1a2030',
-      fontFamily: 'Georgia, serif', letterSpacing: 6
-    }).setOrigin(0.5)
+  // Background — draw BEFORE fadeIn so it's not black
+  this.add.rectangle(400, 250, 800, 500, 0x0a0e12)
+  this.add.rectangle(400, 200, 800, 340, 0x0c1016)
+  this.add.rectangle(400, 460, 800, 80, 0x080c10)
 
-    this.drawMirror(solvedPuzzles)
-    this.drawFinalDoor(solvedPuzzles)
-    this.drawEasterEgg()
-    this.drawSlidingPuzzlePedestal(solvedPuzzles)
+  this.add.text(400, 18, 'THE CHAMBER', {
+    fontSize: '11px', color: '#1a2030',
+    fontFamily: 'Georgia, serif', letterSpacing: 6
+  }).setOrigin(0.5)
 
-    this.cameras.main.fadeIn(800, 0, 0, 0)
+  this.drawMirror(solvedPuzzles)
+  this.drawFinalDoor(solvedPuzzles)
+  this.drawEasterEgg()
+  this.drawSlidingPuzzlePedestal(solvedPuzzles)
 
-    this.solvedHandler = (e) => this.onPuzzleSolved(e.detail)
-    window.addEventListener('puzzleSolved', this.solvedHandler)
-  }
+  // ONE fadeIn only, AFTER all objects are drawn
+  this.cameras.main.fadeIn(600, 0, 0, 0)
+
+  this.solvedHandler = (e) => this.onPuzzleSolved(e.detail)
+  window.addEventListener('puzzleSolved', this.solvedHandler)
+}
 
   drawSlidingPuzzlePedestal(solvedPuzzles) {
     const isSolved = solvedPuzzles.includes('sliding_puzzle')
@@ -209,7 +217,7 @@ export default class Room2Scene extends Phaser.Scene {
           fontSize: '9px', color: '#6b5a3e', fontFamily: 'Georgia, serif'
         }).setOrigin(0.5).setName('coin_label')
         coin.on('pointerdown', () => {
-          store.addItem('Golden_coin')
+          store.addItem('golden_coin')
           coin.destroy()
           this.children.getByName('coin_label')?.destroy()
           this.showRoomMessage('You picked up the golden coin.')
