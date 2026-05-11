@@ -9,7 +9,7 @@ All visual assets in this game (room backgrounds, objects, UI elements) are **pr
 
 ## About the Game
 
-You wake up in a dimly lit study. The door is locked. Objects are scattered across the room, and something feels deliberately wrong about the way things are arranged. Your goal is simple: **escape**.
+You wake up in a dimly little study room. The door is locked. Objects are scattered across the room, and something feels deliberately wrong about the way things are arranged. Your goal is simple: **escape**.
 
 The game spans two rooms, each with its own atmosphere and set of puzzles. You will need to observe your surroundings carefully, collect items, and figure out how they connect. Some puzzles require items you have collected. Others only require attention.
 
@@ -331,6 +331,7 @@ Keeping frontend and backend in one repository makes it easier to track changes 
 ## What I Would Do Next if I continue with this project after this class
 
 - Add a third room with more complex multi-step puzzles
+- Polish and fix some current little bugs(title music sometime not playing, can play multiple time the same puzzle...,etc)
 - Replace placeholder shapes with AI-generated art (Adobe Firefly)  or license free art for all room backgrounds and objects
 - Add animated sprite objects using Phaser's texture atlas support
 - Add a narrative layer — readable journal entries and notes that build a story
