@@ -154,20 +154,6 @@ export default class Room1Scene extends Phaser.Scene {
       .setName('drawer_rect')
     this.add.rectangle(400, 342, 18, 5, 0x8b6914) // handle
 
-    // Journal — opens sliding puzzle
-    const journal = this.add.rectangle(310, 350, 42, 25, 0x1a1508)
-      .setStrokeStyle(1, 0x4a3518)
-      .setInteractive({ cursor: 'pointer' })
-    this.add.text(310, 363, 'journal', {
-      fontSize: '9px', color: '#4a3a22', fontFamily: 'Georgia, serif',
-    }).setOrigin(0.5)
-
-    journal.on('pointerover', () => journal.setFillStyle(0x2a2010))
-    journal.on('pointerout',  () => journal.setFillStyle(0x1a1508))
-    journal.on('pointerdown', () => {
-      window.dispatchEvent(new CustomEvent('openSlidingPuzzle'))
-    })
-
     // Drawer puzzle
     if (solvedPuzzles.includes('drawer_code')) {
       this.add.text(400, 322, '✓', { fontSize: '14px', color: '#6dbf67' }).setOrigin(0.5)
